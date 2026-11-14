@@ -15,6 +15,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -28,7 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.blyric.BuildConfig
+import app.blyric.Prefs
 import app.blyric.media.hasNotificationAccess
 import app.blyric.update.UpdateChecker
 import app.blyric.update.UpdateResult
@@ -41,6 +44,8 @@ fun SettingsScreen(onBack: () -> Unit) {
     val scope = rememberCoroutineScope()
     var checking by remember { mutableStateOf(false) }
     var result by remember { mutableStateOf<UpdateResult?>(null) }
+    val keepScreenOn by Prefs.keepScreenOn.collectAsStateWithLifecycle()
+    val romanize by Prefs.romanize.collectAsStateWithLifecycle()
 
     fun open(url: String) = context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
 
@@ -70,6 +75,21 @@ fun SettingsScreen(onBack: () -> Unit) {
                     context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
                 }) { Text("Buka") }
             }
+
+            SettingToggle(
+                title = "Jaga layar tetap menyala",
+                subtitle = "Layar tidak padam selama ada lagu yang diputar dan Blyric sedang terbuka",
+                checked = keepScreenOn,
+                onCheckedChange = { Prefs.setKeepScreenOn(it) },
+            )
+
+            SettingToggle(
+                title = "Romanisasi lirik",
+                subtitle = "Tampilkan cara baca huruf Latin di bawah lirik berhuruf non-Latin " +
+                    "(Jepang, Korea, Mandarin, Rusia, Arab, Thai, dll.)",
+                checked = romanize,
+                onCheckedChange = { Prefs.setRomanize(it) },
+            )
 
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
@@ -128,5 +148,20 @@ fun SettingsScreen(onBack: () -> Unit) {
             confirmButton = { TextButton(onClick = { result = null }) { Text("OK") } },
         )
         null -> Unit
+    }
+}
+
+@Composable
+private fun SettingToggle(title: String, subtitle: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f).padding(end = 12.dp)) {
+            Text(title, style = MaterialTheme.typography.titleSmall)
+            Text(
+                subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
     }
 }

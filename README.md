@@ -14,6 +14,10 @@ dan vokal latar yang muncul-hilang / tampil bersamaan dengan baris utama.
 2. Metadata dibersihkan (`TrackNormalizer`), lalu lirik diambil berurutan: **Better Lyrics API** → **LRCLIB** (cadangan). Hasil di-cache.
 3. Parser TTML/LRC → model `LyricLine` / `LyricWord`. Posisi lagu dihitung per frame dari snapshot `PlaybackState`, bukan polling.
 4. Compose merender lirik: sorot per kata, auto-scroll, tap baris untuk seek, offset ±100 ms.
+5. Tombol ⏮ ⏯ ⏭ mengendalikan app musik lewat `MediaController`. Di landscape, panel kontrol ada di kiri dan baris aktif selalu di tengah.
+6. Romanisasi (huruf Latin) untuk lirik non-Latin memakai ICU bawaan Android (`android.icu`), tanpa menambah ukuran APK.
+   Batasan: pada lirik Jepang hanya kana yang diromanisasi (kanji dibiarkan); Hangul memakai skema ICU, bukan Revised Romanization.
+7. Pengaturan: *Jaga layar tetap menyala* (saat lagu diputar) dan *Romanisasi lirik*, keduanya bisa dimatikan.
 
 ## Build lokal
 

@@ -35,6 +35,20 @@ object NowPlayingTracker {
     fun seekTo(ms: Long) {
         controller?.transportControls?.seekTo(ms.coerceAtLeast(0))
     }
+
+    fun skipToPrevious() {
+        controller?.transportControls?.skipToPrevious()
+    }
+
+    fun skipToNext() {
+        controller?.transportControls?.skipToNext()
+    }
+
+    /** Jeda bila sedang diputar, lanjutkan bila sedang dijeda. */
+    fun togglePlayPause() {
+        val c = controller ?: return
+        if (_state.value?.isPlaying == true) c.transportControls.pause() else c.transportControls.play()
+    }
 }
 
 fun hasNotificationAccess(context: Context): Boolean =

@@ -23,6 +23,8 @@ data class LyricLine(
     val words: List<LyricWord> = emptyList(),
     val isBackground: Boolean = false,
     val agent: String? = null,
+    /** Romanisasi (huruf Latin) untuk baris berhuruf non-Latin; null bila tidak perlu / dimatikan. */
+    val roman: String? = null,
 )
 
 enum class SyncLevel { WORD, LINE, UNSYNCED }
