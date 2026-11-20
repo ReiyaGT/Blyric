@@ -199,7 +199,6 @@ fun LyricsScreen(vm: LyricsViewModel, onOpenSettings: () -> Unit) {
         } else {
             Column(Modifier.fillMaxSize()) {
                 Header(nowPlaying, onOpenSettings, Modifier.fillMaxWidth())
-                if (nowPlaying != null) SourceSwitcherSlot(showSwitcher, sourceUi, compact = false) { vm.switchSource(it) }
 
                 // Lirik mengisi seluruh area di bawah header, termasuk di belakang kontrol playback. Kontrol
                 // ditumpuk di bawahnya; zona transisi (fade + blur ringan) ada di dalam LyricsList, sehingga
@@ -228,8 +227,40 @@ fun LyricsScreen(vm: LyricsViewModel, onOpenSettings: () -> Unit) {
                     ) {
                         if (nowPlaying != null) {
                             PlayerControls(nowPlaying.isPlaying, Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 4.dp))
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                if (showOffset) {
+                                    TextButton(
+                                        onClick = { offsetMs -= 100 },
+                                        contentPadding = PaddingValues(horizontal = 8.dp),
+                                    ) { Text("−100 ms") }
+                                }
+                                SourceSwitcherSlot(
+                                    showSwitcher,
+                                    sourceUi,
+                                    compact = true,
+                                    modifier = Modifier.width(208.dp),
+                                ) { vm.switchSource(it) }
+                                if (showOffset) {
+                                    TextButton(
+                                        onClick = { offsetMs += 100 },
+                                        contentPadding = PaddingValues(horizontal = 8.dp),
+                                    ) { Text("+100 ms") }
+                                }
+                            }
+                            if (showOffset) {
+                                Text(
+                                    "Offset ${if (offsetMs > 0) "+" else ""}$offsetMs ms",
+                                    Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textAlign = TextAlign.Center,
+                                )
+                            }
                         }
-                        if (showOffset) OffsetControls(offsetMs, compact = false) { offsetMs += it }
                     }
                 }
             }
@@ -280,9 +311,10 @@ private fun SourceSwitcherSlot(
     visible: Boolean,
     sourceUi: SourceUi,
     compact: Boolean,
+    modifier: Modifier = Modifier.fillMaxWidth(),
     onSwitch: (Int) -> Unit,
 ) {
-    Box(Modifier.fillMaxWidth().height(SwitcherHeight), contentAlignment = Alignment.Center) {
+    Box(modifier.height(SwitcherHeight), contentAlignment = Alignment.Center) {
         AnimatedVisibility(visible, enter = fadeIn(tween(250)), exit = fadeOut(tween(200))) {
             SourceSwitcher(
                 label = sourceUi.selected.orEmpty(),
