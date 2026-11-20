@@ -76,12 +76,19 @@ android {
     }
     kotlinOptions { jvmTarget = "17" }
 
-    packaging {
-        resources {
-            // Kuromoji (core + ipadic) membawa berkas lisensi dengan nama sama; cukup salah satu.
-            excludes += setOf("META-INF/LICENSE*", "META-INF/NOTICE*", "META-INF/DEPENDENCIES")
-        }
+packaging {
+    resources {
+        // Kuromoji (core + ipadic) membawa berkas metadata yang duplikat.
+        excludes += setOf(
+            "META-INF/LICENSE*",
+            "META-INF/NOTICE*",
+            "META-INF/DEPENDENCIES",
+            "META-INF/CONTRIBUTORS.md"
+        )
     }
+    }
+
+
 }
 
 dependencies {
