@@ -21,6 +21,19 @@ internal object Scripts {
         return false
     }
 
+    fun isHan(cp: Int): Boolean = script(cp) == Character.UnicodeScript.HAN
+
+    /** True bila ada kana atau kanji/Han (huruf yang butuh pembacaan khusus bahasa Jepang). */
+    fun hasJapanese(text: String): Boolean {
+        var i = 0
+        while (i < text.length) {
+            val cp = text.codePointAt(i)
+            if (isKana(cp) || isHan(cp)) return true
+            i += Character.charCount(cp)
+        }
+        return false
+    }
+
     /** True bila ada karakter yang bukan Latin/angka/tanda baca (misalnya Kiril, Hangul, Han, Arab, Thai). */
     fun needsRomanization(text: String): Boolean {
         var i = 0

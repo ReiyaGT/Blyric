@@ -75,6 +75,13 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
+
+    packaging {
+        resources {
+            // Kuromoji (core + ipadic) membawa berkas lisensi dengan nama sama; cukup salah satu.
+            excludes += setOf("META-INF/LICENSE*", "META-INF/NOTICE*", "META-INF/DEPENDENCIES")
+        }
+    }
 }
 
 dependencies {
@@ -86,6 +93,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    // Romanisasi kanji sadar-konteks (pembacaan/yomi). Menambah ±10 MB pada APK karena membawa kamus IPADIC.
+    implementation("com.atilika.kuromoji:kuromoji-ipadic:0.9.0")
 
     testImplementation("junit:junit:4.13.2")
 }

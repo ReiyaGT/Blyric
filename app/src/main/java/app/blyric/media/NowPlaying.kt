@@ -1,6 +1,7 @@
 package app.blyric.media
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.media.session.MediaController
 import android.os.SystemClock
 import androidx.core.app.NotificationManagerCompat
@@ -15,6 +16,8 @@ data class NowPlaying(
     val speed: Float,
     /** Waktu (elapsedRealtime) saat [positionMs] diambil. */
     val updatedAtMs: Long,
+    /** Thumbnail kecil (48 px) sampul album untuk menentukan warna latar; null bila app musik tidak menyediakannya. */
+    val artwork: Bitmap? = null,
 ) {
     fun currentPosition(now: Long = SystemClock.elapsedRealtime()): Long =
         if (isPlaying) positionMs + ((now - updatedAtMs) * speed).toLong() else positionMs

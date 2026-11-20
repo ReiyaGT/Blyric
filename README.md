@@ -15,9 +15,15 @@ dan vokal latar yang muncul-hilang / tampil bersamaan dengan baris utama.
 3. Parser TTML/LRC → model `LyricLine` / `LyricWord`. Posisi lagu dihitung per frame dari snapshot `PlaybackState`, bukan polling.
 4. Compose merender lirik: sorot per kata, auto-scroll, tap baris untuk seek, offset ±100 ms.
 5. Tombol ⏮ ⏯ ⏭ mengendalikan app musik lewat `MediaController`. Di landscape, panel kontrol ada di kiri dan baris aktif selalu di tengah.
-6. Romanisasi (huruf Latin) untuk lirik non-Latin memakai ICU bawaan Android (`android.icu`), tanpa menambah ukuran APK.
-   Batasan: pada lirik Jepang hanya kana yang diromanisasi (kanji dibiarkan); Hangul memakai skema ICU, bukan Revised Romanization.
-7. Pengaturan: *Jaga layar tetap menyala* (saat lagu diputar) dan *Romanisasi lirik*, keduanya bisa dimatikan.
+6. Romanisasi (huruf Latin) untuk lirik non-Latin. Lirik Jepang (hiragana, katakana, **dan kanji**) dibaca oleh Kuromoji (kamus IPADIC)
+   sesuai konteks kalimat, lalu diubah ke romaji (partikel は/へ/を → wa/e/o). Aksara lain (Kiril, Hangul, Arab, Thai, Han/pinyin, dll.)
+   memakai ICU bawaan Android (`android.icu`).
+   Batasan: kamus Kuromoji menambah ±10 MB pada APK; kanji di luar kamus (nama/ateji langka) dibiarkan apa adanya;
+   Hangul memakai skema ICU, bukan Revised Romanization.
+7. Tampilan: latar gradient mengikuti warna sampul album (diekstrak dari artwork sesi media; tema bawaan bila tidak ada), system bar
+   transparan sehingga navigation bar menyatu dengan latar, tombol `‹ SUMBER ›` untuk berganti sumber lirik (Better Lyrics / LRCLIB),
+   dan lirik di portrait memudar halus (fade + blur ringan di Android 12+) sebelum kontrol playback.
+8. Pengaturan: *Jaga layar tetap menyala* (saat lagu diputar) dan *Romanisasi lirik*, keduanya bisa dimatikan.
 
 ## Build lokal
 

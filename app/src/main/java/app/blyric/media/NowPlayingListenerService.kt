@@ -1,6 +1,7 @@
 package app.blyric.media
 
 import android.content.ComponentName
+import android.graphics.Bitmap
 import android.media.MediaMetadata
 import android.media.session.MediaController
 import android.media.session.MediaSessionManager
@@ -18,6 +19,10 @@ class NowPlayingListenerService : NotificationListenerService() {
     private var component: ComponentName? = null
     private var active: List<MediaController> = emptyList()
     private val callbacks = HashMap<MediaController, MediaController.Callback>()
+
+    // Thumbnail sampul di-cache per lagu supaya tidak diolah ulang di setiap perubahan status play/pause.
+    private var artKey: String? = null
+    private var artThumb: Bitmap? = null
 
     private val sessionsListener = MediaSessionManager.OnActiveSessionsChangedListener { list ->
         onSessions(list.orEmpty())
@@ -74,6 +79,13 @@ class NowPlayingListenerService : NotificationListenerService() {
             ?: meta.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST).orEmpty()
         val st = chosen.playbackState
         val now = SystemClock.elapsedRealtime()
+        val key = "$title|$artist|${meta.getString(MediaMetadata.METADATA_KEY_ALBUM)}"
+        if (key != artKey) {
+            artKey = key
+            artThumb = null
+        }
+        // Sebagian app mengirim sampul sedikit terlambat; selama masih null, coba lagi di refresh berikutnya.
+        if (artThumb == null) artThumb = thumbnail(meta)
         NowPlayingTracker.update(
             NowPlaying(
                 track = TrackInfo(
@@ -87,8 +99,27 @@ class NowPlayingListenerService : NotificationListenerService() {
                 positionMs = (st?.position ?: 0L).coerceAtLeast(0L),
                 speed = st?.playbackSpeed?.takeIf { it > 0f } ?: 1f,
                 updatedAtMs = st?.lastPositionUpdateTime?.takeIf { it > 0 } ?: now,
+                artwork = artThumb,
             ),
             chosen,
         )
+    }
+
+    private fun thumbnail(meta: MediaMetadata): Bitmap? {
+        val src = meta.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
+            ?: meta.getBitmap(MediaMetadata.METADATA_KEY_ART)
+            ?: meta.getBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON)
+            ?: return null
+        return try {
+            // Salinan software berukuran kecil: aman dibaca piksel-nya dan tidak ikut di-recycle oleh app musik.
+            Bitmap.createScaledBitmap(src, THUMB_SIZE, THUMB_SIZE, true)
+                .let { if (it === src) it.copy(Bitmap.Config.ARGB_8888, false) else it }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private companion object {
+        const val THUMB_SIZE = 48
     }
 }
